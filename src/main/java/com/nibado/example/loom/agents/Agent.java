@@ -1,4 +1,4 @@
-package com.nibado.example.loom;
+package com.nibado.example.loom.agents;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

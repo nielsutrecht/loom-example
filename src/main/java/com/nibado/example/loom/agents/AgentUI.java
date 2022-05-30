@@ -1,4 +1,4 @@
-package com.nibado.example.loom;
+package com.nibado.example.loom.agents;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +12,6 @@ public class AgentUI {
         panel.repaint();
     });
 
-    private final Timer statsTimer = new Timer(1000, e -> {
-        Thread.getAllStackTraces().keySet().forEach(t -> System.out.println(t.getName()));
-    });
-
     public void run() {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(new Dimension(800, 600));
@@ -26,7 +22,6 @@ public class AgentUI {
         frame.setVisible(true);
 
         timer.start();
-        statsTimer.start();
     }
 
     public static void main(String[] args) {
