@@ -8,9 +8,9 @@ public class Agents {
     private final List<Agent> agents;
     private final List<Thread> threads;
 
-    public Agents(int amount) {
+    public Agents(int amount, World world) {
         agents = IntStream.rangeClosed(0, amount).mapToObj(i ->
-            new Agent()
+            new Agent(world)
         ).toList();
 
         threads = agents.stream().map(Thread::startVirtualThread).toList();
@@ -18,9 +18,5 @@ public class Agents {
 
     public Collection<Agent> agents() {
         return agents;
-    }
-
-    public void tick() {
-
     }
 }

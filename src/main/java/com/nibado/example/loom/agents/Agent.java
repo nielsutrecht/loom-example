@@ -15,26 +15,35 @@ public class Agent implements Runnable {
     private double angle;
     private double velocity = VELOCITY;
 
-    public Agent() {
+    private final World world;
+
+    public Agent(World world) {
         x = Math.random();
         y = Math.random();
         angle = Math.random() * TAU;
+        this.world = world;
     }
 
     private void think() {
-        if (Math.random() <= TURN_CHANCE) {
+        if(world.distanceToAvoid(this) < World.AVOID_DISTANCE) {
+            setAngle(world.angleToAvoid(this));
+        } else if (Math.random() <= TURN_CHANCE) {
             var toAdd = Math.random() >= 0.5 ? TURN_RATE : -TURN_RATE;
             addAngle(toAdd);
         }
     }
 
-    private void addAngle(double angle) {
-        this.angle += angle;
-        if (this.angle > TAU) {
-            this.angle -= TAU;
-        } else if (this.angle < 0) {
-            this.angle += TAU;
+    private void setAngle(double angle) {
+        if(angle > TAU) {
+            angle -= TAU;
+        } else if(angle < 0) {
+            angle += TAU;
         }
+        this.angle = angle;
+    }
+
+    private void addAngle(double angle) {
+        setAngle(this.angle + angle);
     }
 
     private void move() {

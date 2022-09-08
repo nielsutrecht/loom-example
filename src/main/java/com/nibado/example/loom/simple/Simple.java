@@ -1,46 +1,53 @@
 package com.nibado.example.loom.simple;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
+import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
+
+import static com.nibado.example.loom.Util.sleep;
 
 public class Simple {
 
     public static void main(String[] args) throws Exception {
-        printThreads();
+        executorServiceExample();
+    }
 
-        System.in.read();
+    public static void startVirtualExample() throws Exception {
+        var amount = 1_000_000;
 
-        var latch = new CountDownLatch(1000);
+        var latch = new CountDownLatch(amount);
 
-        IntStream.range(0, 1000).forEach(i -> {
+        IntStream.range(0, amount).forEach(i -> {
             Thread.startVirtualThread(() -> {
-                System.out.printf("Virtual thread %3s started\n", i);
-                sleep((int) (Math.random() * 5000.0));
+                System.out.println("Runnable " + i);
+                sleep(1000);
                 latch.countDown();
-                System.out.printf("Virtual thread %3s finished\n", i);
             });
         });
 
         latch.await();
 
-        printThreads();
+        System.out.println("startVirtualExample: Done!");
     }
 
-    private static void printThreads() {
-        var groups = Thread.getAllStackTraces().keySet().stream()
-            .collect(Collectors.groupingBy(t -> t.getThreadGroup().getName()));
+    public static void executorServiceExample() throws Exception {
+        var amount = 1_000_000;
+        var ex = Executors.newFixedThreadPool(
+            amount, Thread.ofVirtual().factory()
+        );
 
-        groups.forEach((key, value) -> {
-            System.out.println(key);
-            value.forEach(t -> System.out.printf("- %s\n", t.getName()));
+        var latch = new CountDownLatch(amount);
+        IntStream.range(0, amount).forEach(i -> {
+            ex.submit(() -> {
+                System.out.println("Runnable " + i);
+                sleep(1000);
+                latch.countDown();
+            });
         });
-    }
 
-    private static void sleep(int duration) {
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException e) {
-        }
+        latch.await();
+        ex.shutdown();
+
+        System.out.println("executorServiceExample: Done!");
     }
 }
